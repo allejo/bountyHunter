@@ -112,7 +112,7 @@ void BountyHunter::Event (bz_EventData *eventData)
                 }
 
                 // If the person killed was carrying a team flag less than 0.01 seconds ago, then reward the killer
-                if (lastFlagCarrier == victimID && flagCarryTime + 0.01 > bz_getCurrentTime())
+                if (lastFlagCarrier == victimID && flagCarryTime + 0.2 > bz_getCurrentTime())
                 {
                     // Store the team color
                     std::string teamColor = "";
