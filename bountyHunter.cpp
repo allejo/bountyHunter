@@ -1,6 +1,6 @@
 /*
 Bounty Hunter
-    Copyright (C) 2014 Vladimir "allejo" Jimenez
+    Copyright (C) 2015 Vladimir "allejo" Jimenez
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -105,13 +105,22 @@ void BountyHunter::Event (bz_EventData *eventData)
                     if (bountyPoints > 0)
                     {
                         // Set the player's new points and notify them
-                        bz_setPlayerWins(killerID, bz_getPlayerWins(killerID) + bountyPoints);
-                        bz_sendTextMessagef(BZ_SERVER, killerID, "Stopping %s's rampage earned you %i bounty points.",
-                            bz_getPlayerByIndex(victimID)->callsign.c_str(), bountyPoints);
+                        if (dieData->team == dieData->killerTeam)
+                        {
+                            int penalty = bountyPoints * 2;
+
+                            bz_incrementPlayerLosses(killerID, penalty);
+                            bz_sendTextMessagef(BZ_SERVER, killerID, "Stopping your teammate's rampage is in poor taste. You have received a penalty of %i points", bountyPoints);
+                        }
+                        else
+                        {
+                            bz_incrementPlayerWins(killerID, bountyPoints);
+                            bz_sendTextMessagef(BZ_SERVER, killerID, "Stopping %s's rampage earned you %i bounty points.", bz_getPlayerByIndex(victimID)->callsign.c_str(), bountyPoints);
+                        }
                     }
                 }
 
-                // If the person killed was carrying a team flag less than 0.01 seconds ago, then reward the killer
+                // If the person killed was carrying a team flag less than 0.2 seconds ago, then reward the killer
                 if (lastFlagCarrier == victimID && flagCarryTime + 0.2 > bz_getCurrentTime())
                 {
                     // Store the team color
@@ -124,9 +133,16 @@ void BountyHunter::Event (bz_EventData *eventData)
                     else if (teamFlagDropped == "P*") { teamColor = "purple"; }
 
                     // Set the player's new points and notify them
-                    bz_setPlayerWins(killerID, bz_getPlayerWins(killerID) + 2);
-                    bz_sendTextMessagef(BZ_SERVER, killerID, "Shooting the %s team flag carrier has earned you 2 bounty points",
-                        teamColor.c_str());
+                    if (dieData->team == dieData->killerTeam)
+                    {
+                        bz_incrementPlayerLosses(killerID, 4);
+                        bz_sendTextMessagef(BZ_SERVER, killerID, "Killing your teammate is in poor taste. You have received a penalty of 4 points", teamColor.c_str());
+                    }
+                    else
+                    {
+                        bz_incrementPlayerWins(killerID, 2);
+                        bz_sendTextMessagef(BZ_SERVER, killerID, "Shooting the %s team flag carrier has earned you 2 bounty points", teamColor.c_str());
+                    }
                 }
             }
 
