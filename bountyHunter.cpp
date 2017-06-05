@@ -105,7 +105,7 @@ void BountyHunter::Event (bz_EventData *eventData)
                     if (bountyPoints > 0)
                     {
                         // Set the player's new points and notify them
-                        if (dieData->team == dieData->killerTeam)
+                        if (dieData->team == dieData->killerTeam && dieData->team != eRogueTeam)
                         {
                             int penalty = bountyPoints * 2;
 
