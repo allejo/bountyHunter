@@ -133,7 +133,7 @@ void BountyHunter::Event (bz_EventData *eventData)
                     else if (teamFlagDropped == "P*") { teamColor = "purple"; }
 
                     // Set the player's new points and notify them
-                    if (dieData->team == dieData->killerTeam)
+                    if (dieData->team == dieData->killerTeam && dieData->killerTeam != eRogueTeam)
                     {
                         bz_incrementPlayerLosses(killerID, 4);
                         bz_sendTextMessagef(BZ_SERVER, killerID, "Killing your teammate is in poor taste. You have received a penalty of 4 points", teamColor.c_str());
